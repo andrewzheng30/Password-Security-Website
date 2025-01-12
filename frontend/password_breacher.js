@@ -8,15 +8,23 @@ document.getElementById('check-breach').addEventListener('click', async function
         return;
     }
 
+    // Show loading message
+    breachResultElement.textContent = "Checking password...";
+    breachResultElement.style.color = "blue";
+
     try {
-        const breached = await checkPasswordBreach(password);
-        breachResultElement.textContent = breached
-            ? "Your password has been exposed in a data breach."
-            : "Your password is safe.";
-        breachResultElement.style.color = breached ? "red" : "green";
+        const breachCount = await checkPasswordBreach(password);
+        if (breachCount > 0) {
+            breachResultElement.textContent = `Your password has been exposed in ${breachCount} breaches. Please change it immediately!`;
+            breachResultElement.style.color = "red";
+        } else {
+            breachResultElement.textContent = "Your password is safe and has not been found in any breaches.";
+            breachResultElement.style.color = "green";
+        }
     } catch (error) {
-        breachResultElement.textContent = "Error checking password breach.";
+        breachResultElement.textContent = "Error checking password breach. Please try again.";
         breachResultElement.style.color = "orange";
+        console.error("Error:", error);
     }
 });
 
@@ -26,9 +34,20 @@ async function checkPasswordBreach(password) {
     const suffix = hash.slice(5).toUpperCase();
 
     const response = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`);
+    if (!response.ok) {
+        throw new Error("Failed to fetch data from Have I Been Pwned API");
+    }
+
     const data = await response.text();
 
-    return data.includes(suffix);
+    // Check for the hash suffix in the API response and get the breach count
+    const matches = data.split('\n').find(line => line.startsWith(suffix));
+    if (matches) {
+        const count = parseInt(matches.split(':')[1], 10); // Extract breach count
+        return count;
+    }
+
+    return 0; // No matches found
 }
 
 async function sha1(message) {

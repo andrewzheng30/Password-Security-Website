@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Security Tips</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="behavioralChart.js" defer></script>
 </head>
 <body>
     <!-- Navigation Bar -->
@@ -48,6 +50,12 @@
                 <li>59% of US adults use birthdays or names in their passwords.</li>
                 <li>13% of Americans use the same password for every account.</li>
             </ul>
+        </section>
+
+        <!-- Chart Section -->
+        <section class="chart-section">
+            <h2>Behavioral Password Statistics</h2>
+            <canvas id="behavioralBarChart" width="800" height="400"></canvas>
         </section>
 
         <!-- Importance Section -->
